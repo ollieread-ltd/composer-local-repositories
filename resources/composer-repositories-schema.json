@@ -1,0 +1,608 @@
+{
+  "$schema"    : "https://json-schema.org/draft-04/schema#",
+  "title"      : "Package Repositories",
+  "type"       : "object",
+  "properties" : {
+    "repositories": {
+      "type"                : [
+        "object",
+        "array"
+      ],
+      "description"         : "A set of additional repositories where packages can be found.",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/repository"
+          },
+          {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          }
+        ]
+      },
+      "items"               : {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/repository"
+          },
+          {
+            "type"                : "object",
+            "additionalProperties": {
+              "type": "boolean",
+              "enum": [
+                false
+              ]
+            },
+            "minProperties"       : 1,
+            "maxProperties"       : 1
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "authors"            : {
+      "type"       : "array",
+      "description": "List of authors that contributed to the package. This is typically the main maintainers, not the full list.",
+      "items"      : {
+        "type"                : "object",
+        "additionalProperties": false,
+        "required"            : [
+          "name"
+        ],
+        "properties"          : {
+          "name"    : {
+            "type"       : "string",
+            "description": "Full name of the author."
+          },
+          "email"   : {
+            "type"       : "string",
+            "description": "Email address of the author.",
+            "format"     : "email"
+          },
+          "homepage": {
+            "type"       : "string",
+            "description": "Homepage URL for the author.",
+            "format"     : "uri"
+          },
+          "role"    : {
+            "type"       : "string",
+            "description": "Author's role in the project."
+          }
+        }
+      }
+    },
+    "autoload"           : {
+      "type"       : "object",
+      "description": "Description of how the package can be autoloaded.",
+      "properties" : {
+        "psr-0"                : {
+          "type"                : "object",
+          "description"         : "This is an object of namespaces (keys) and the directories they can be found in (values, can be arrays of paths) by the autoloader.",
+          "additionalProperties": {
+            "type" : [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "psr-4"                : {
+          "type"                : "object",
+          "description"         : "This is an object of namespaces (keys) and the PSR-4 directories they can map to (values, can be arrays of paths) by the autoloader.",
+          "additionalProperties": {
+            "type" : [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "classmap"             : {
+          "type"       : "array",
+          "description": "This is an array of paths that contain classes to be included in the class-map generation process."
+        },
+        "files"                : {
+          "type"       : "array",
+          "description": "This is an array of files that are always required on every request."
+        },
+        "exclude-from-classmap": {
+          "type"       : "array",
+          "description": "This is an array of patterns to exclude from autoload classmap generation. (e.g. \"exclude-from-classmap\": [\"/test/\", \"/tests/\", \"/Tests/\"]"
+        }
+      }
+    },
+    "repository"         : {
+      "type" : "object",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/composer-repository"
+        },
+        {
+          "$ref": "#/definitions/vcs-repository"
+        },
+        {
+          "$ref": "#/definitions/path-repository"
+        },
+        {
+          "$ref": "#/definitions/artifact-repository"
+        },
+        {
+          "$ref": "#/definitions/pear-repository"
+        },
+        {
+          "$ref": "#/definitions/package-repository"
+        }
+      ]
+    },
+    "composer-repository": {
+      "type"      : "object",
+      "required"  : [
+        "type",
+        "url"
+      ],
+      "properties": {
+        "type"                : {
+          "type": "string",
+          "enum": [
+            "composer"
+          ]
+        },
+        "url"                 : {
+          "type": "string"
+        },
+        "canonical"           : {
+          "type": "boolean"
+        },
+        "only"                : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude"             : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "options"             : {
+          "type"                : "object",
+          "additionalProperties": true
+        },
+        "allow_ssl_downgrade" : {
+          "type": "boolean"
+        },
+        "force-lazy-providers": {
+          "type": "boolean"
+        }
+      }
+    },
+    "vcs-repository"     : {
+      "type"      : "object",
+      "required"  : [
+        "type",
+        "url"
+      ],
+      "properties": {
+        "type"                       : {
+          "type": "string",
+          "enum": [
+            "vcs",
+            "github",
+            "git",
+            "gitlab",
+            "bitbucket",
+            "git-bitbucket",
+            "hg",
+            "fossil",
+            "perforce",
+            "svn"
+          ]
+        },
+        "url"                        : {
+          "type": "string"
+        },
+        "canonical"                  : {
+          "type": "boolean"
+        },
+        "only"                       : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude"                    : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "no-api"                     : {
+          "type": "boolean"
+        },
+        "secure-http"                : {
+          "type": "boolean"
+        },
+        "svn-cache-credentials"      : {
+          "type": "boolean"
+        },
+        "trunk-path"                 : {
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "branches-path"              : {
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "tags-path"                  : {
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "package-path"               : {
+          "type": "string"
+        },
+        "depot"                      : {
+          "type": "string"
+        },
+        "branch"                     : {
+          "type": "string"
+        },
+        "unique_perforce_client_name": {
+          "type": "string"
+        },
+        "p4user"                     : {
+          "type": "string"
+        },
+        "p4password"                 : {
+          "type": "string"
+        }
+      }
+    },
+    "path-repository"    : {
+      "type"      : "object",
+      "required"  : [
+        "type",
+        "url"
+      ],
+      "properties": {
+        "type"     : {
+          "type": "string",
+          "enum": [
+            "path"
+          ]
+        },
+        "url"      : {
+          "type": "string"
+        },
+        "canonical": {
+          "type": "boolean"
+        },
+        "only"     : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude"  : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "options"  : {
+          "type"                : "object",
+          "properties"          : {
+            "symlink": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+    "artifact-repository": {
+      "type"      : "object",
+      "required"  : [
+        "type",
+        "url"
+      ],
+      "properties": {
+        "type"     : {
+          "type": "string",
+          "enum": [
+            "artifact"
+          ]
+        },
+        "url"      : {
+          "type": "string"
+        },
+        "canonical": {
+          "type": "boolean"
+        },
+        "only"     : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude"  : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "pear-repository"    : {
+      "type"      : "object",
+      "required"  : [
+        "type",
+        "url"
+      ],
+      "properties": {
+        "type"        : {
+          "type": "string",
+          "enum": [
+            "pear"
+          ]
+        },
+        "url"         : {
+          "type": "string"
+        },
+        "canonical"   : {
+          "type": "boolean"
+        },
+        "only"        : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude"     : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "vendor-alias": {
+          "type": "string"
+        }
+      }
+    },
+    "package-repository" : {
+      "type"      : "object",
+      "required"  : [
+        "type",
+        "package"
+      ],
+      "properties": {
+        "type"     : {
+          "type": "string",
+          "enum": [
+            "package"
+          ]
+        },
+        "canonical": {
+          "type": "boolean"
+        },
+        "only"     : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude"  : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "package"  : {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/inline-package"
+            },
+            {
+              "type" : "array",
+              "items": {
+                "$ref": "#/definitions/inline-package"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "inline-package"     : {
+      "type"                : "object",
+      "required"            : [
+        "name",
+        "version"
+      ],
+      "properties"          : {
+        "name"        : {
+          "type"       : "string",
+          "description": "Package name, including 'vendor-name/' prefix."
+        },
+        "type"        : {
+          "type": "string"
+        },
+        "target-dir"  : {
+          "description": "DEPRECATED: Forces the package to be installed into the given subdirectory path. This is used for autoloading PSR-0 packages that do not contain their full path. Use forward slashes for cross-platform compatibility.",
+          "type"       : "string"
+        },
+        "description" : {
+          "type": "string"
+        },
+        "keywords"    : {
+          "type" : "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "homepage"    : {
+          "type"  : "string",
+          "format": "uri"
+        },
+        "version"     : {
+          "type": "string"
+        },
+        "time"        : {
+          "type": "string"
+        },
+        "license"     : {
+          "type": [
+            "string",
+            "array"
+          ]
+        },
+        "authors"     : {
+          "$ref": "#/definitions/authors"
+        },
+        "require"     : {
+          "type"                : "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "replace"     : {
+          "type"                : "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "conflict"    : {
+          "type"                : "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "provide"     : {
+          "type"                : "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "require-dev" : {
+          "type"                : "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "suggest"     : {
+          "type"                : "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "extra"       : {
+          "type"                : [
+            "object",
+            "array"
+          ],
+          "additionalProperties": true
+        },
+        "autoload"    : {
+          "$ref": "#/definitions/autoload"
+        },
+        "archive"     : {
+          "type"      : [
+            "object"
+          ],
+          "properties": {
+            "exclude": {
+              "type": "array"
+            }
+          }
+        },
+        "bin"         : {
+          "type"       : [
+            "string",
+            "array"
+          ],
+          "description": "A set of files, or a single file, that should be treated as binaries and symlinked into bin-dir (from config).",
+          "items"      : {
+            "type": "string"
+          }
+        },
+        "include-path": {
+          "type"       : [
+            "array"
+          ],
+          "description": "DEPRECATED: A list of directories which should get added to PHP's include path. This is only present to support legacy projects, and all new code should preferably use autoloading.",
+          "items"      : {
+            "type": "string"
+          }
+        },
+        "source"      : {
+          "$ref": "#/definitions/source"
+        },
+        "dist"        : {
+          "$ref": "#/definitions/dist"
+        }
+      },
+      "additionalProperties": true
+    },
+    "source"             : {
+      "type"      : "object",
+      "required"  : [
+        "type",
+        "url",
+        "reference"
+      ],
+      "properties": {
+        "type"     : {
+          "type": "string"
+        },
+        "url"      : {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "mirrors"  : {
+          "type": "array"
+        }
+      }
+    },
+    "dist"               : {
+      "type"      : "object",
+      "required"  : [
+        "type",
+        "url"
+      ],
+      "properties": {
+        "type"     : {
+          "type": "string"
+        },
+        "url"      : {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "shasum"   : {
+          "type": "string"
+        },
+        "mirrors"  : {
+          "type": "array"
+        }
+      }
+    }
+  }
+}

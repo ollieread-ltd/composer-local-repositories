@@ -1,0 +1,28 @@
+{
+  "name"             : "ollieread/composer-local-packages",
+  "description"      : "Composer plugin that automatically loads local package repositories",
+  "type"             : "composer-plugin",
+  "require"          : {
+    "php"                : "^8.1",
+    "composer-plugin-api": "^2.6"
+  },
+  "require-dev"      : {
+    "composer/composer": "^2.7"
+  },
+  "license"          : "MIT",
+  "autoload"         : {
+    "psr-4": {
+      "Ollieread\\ComposerLocalRepositories\\": "src/"
+    }
+  },
+  "authors"          : [
+    {
+      "name" : "Ollie",
+      "email": "code@ollie.codes"
+    }
+  ],
+  "minimum-stability": "stable",
+  "extra"            : {
+    "class": "Ollieread\\ComposerLocalRepositories\\LocalRepositoryPlugin"
+  }
+}
