@@ -1,5 +1,5 @@
 {
-  "name"             : "ollieread/composer-local-packages",
+  "name"             : "ollieread/composer-local-repositories",
   "description"      : "Composer plugin that automatically loads local package repositories",
   "type"             : "composer-plugin",
   "require"          : {
