@@ -18,14 +18,11 @@ class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterfa
 {
     private Composer $composer;
     private IOInterface $io;
-    private bool $is_main_composer;
 
     public function activate(Composer $composer, IOInterface $io): void
     {
         $this->composer = $composer;
         $this->io = $io;
-        // Composer runs copies of itself inside the run. We use this to prevent writing the same output multiple times.
-        $this->is_main_composer = !str_contains(get_class($this), '_composer_tmp');
     }
 
     public static function getSubscribedEvents(): array
@@ -49,16 +46,11 @@ class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterfa
         $packagesPath = $rootPath . DIRECTORY_SEPARATOR . 'repositories.json';
 
         if (!file_exists($packagesPath)) {
-            if ($this->is_main_composer) {
-                $this->io->write('<info>No local repositories.json available</info>', true, IOInterface::VERBOSE);
-            }
+            $this->io->write('<info>No local repositories.json available</info>', true, IOInterface::VERBOSE);
             return;
         }
 
-        if ($this->is_main_composer) {
-            $this->io->write('<info>Local repositories.json available</info>');
-        }
-
+        $this->io->write('<info>Local repositories.json available</info>');
         $this->loadPackagesFrom($packagesPath);
     }
 
