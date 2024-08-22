@@ -9,19 +9,26 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Json\JsonValidationException;
+use Composer\Package\BasePackage;
+use Composer\Package\Link;
 use Composer\Plugin\CommandEvent;
 use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PluginInterface;
+use Composer\Repository\RepositoryInterface;
+use Composer\Semver\Constraint\MatchAllConstraint;
 use Seld\JsonLint\ParsingException;
 
+/**
+ * @phpstan-type Configuration array{"ignore-options"?: string[], "trigger-commands"?: string[], "force-dev"?: bool}
+ */
 class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterface
 {
-    private Composer $composer;
-    private IOInterface $io;
     /**
-     * @var array{"ignore-options"?: string[], "trigger-commands"?: string[]|null}
+     * @var Configuration
      */
     private array $config;
+    private Composer $composer;
+    private IOInterface $io;
 
     public function activate(Composer $composer, IOInterface $io): void
     {
@@ -101,14 +108,14 @@ class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterfa
         );
 
         $this->io->write('<info>Adding repository:</info> ' . $repository->getRepoName());
-
         $manager->prependRepository($repository);
+        $this->updateDependencyConstraints($repository);
 
         $this->io->write('Repository added successfully', true, IOInterface::VERBOSE);
     }
 
     /**
-     * @return array{"ignore-options"?: string[], "trigger-commands"?: string[]}
+     * @return Configuration
      */
     private function getConfig(): array
     {
@@ -131,6 +138,43 @@ class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterfa
         return $this->config;
     }
 
+    private function updateDependencyConstraints(RepositoryInterface $repository): void
+    {
+        $config = $this->getConfig();
+        if (!($config['force-dev'] ?? true)) {
+            return;
+        }
+
+        $dev_constraint = new MatchAllConstraint();
+        $dev_constraint->setPrettyString('@dev');
+
+        $root_package = $this->composer->getPackage();
+        $requires = $root_package->getRequires();
+        $dev_requires = $root_package->getDevRequires();
+        $stability_flags = $root_package->getStabilityFlags();
+
+        foreach ($repository->getPackages() as $package) {
+            foreach ([&$requires, &$dev_requires] as &$packages) {
+                if (!$link = $packages[$package->getName()] ?? null) {
+                    continue;
+                }
+
+                $packages[$package->getName()] = new Link(
+                    $link->getSource(),
+                    $link->getTarget(),
+                    clone $dev_constraint,
+                    $link->getDescription(), // @phpstan-ignore argument.type
+                    $dev_constraint->getPrettyString(),
+                );
+                $stability_flags[$package->getName()] = BasePackage::STABILITY_DEV;
+                unset($packages);
+            }
+        }
+
+        $root_package->setRequires($requires);
+        $root_package->setDevRequires($dev_requires);
+        $root_package->setStabilityFlags($stability_flags);
+    }
 
     public function deactivate(Composer $composer, IOInterface $io): void
     {
@@ -141,4 +185,5 @@ class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterfa
     {
         // This is intentionally empty
     }
+
 }
