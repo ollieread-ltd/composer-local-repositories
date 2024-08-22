@@ -7,7 +7,8 @@
     "composer-plugin-api": "^2.6"
   },
   "require-dev"      : {
-    "composer/composer": "^2.7"
+    "composer/composer": "^2.7",
+    "phpstan/phpstan": "^1.11"
   },
   "license"          : "MIT",
   "autoload"         : {
@@ -19,10 +20,17 @@
     {
       "name" : "Ollie",
       "email": "code@ollie.codes"
+    },
+    {
+      "name": "Doeke Norg",
+      "email": "mail@doeken.org"
     }
   ],
   "minimum-stability": "stable",
   "extra"            : {
-    "class": "Ollieread\\ComposerLocalRepositories\\LocalRepositoryPlugin"
+    "class": "Ollieread\\ComposerLocalRepositories\\LocalRepositoriesPlugin"
+  },
+  "scripts": {
+    "analyse": "vendor/bin/phpstan analyse"
   }
 }

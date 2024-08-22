@@ -1,0 +1,7 @@
+includes:
+    - vendor/composer/composer/phpstan/rules.neon
+
+parameters:
+	level: 8
+	paths:
+		- src
