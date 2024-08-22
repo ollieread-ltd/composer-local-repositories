@@ -18,6 +18,10 @@ class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterfa
 {
     private Composer $composer;
     private IOInterface $io;
+    /**
+     * @var array{"ignore-options"?: string[], "trigger-commands"?: string[]|null}
+     */
+    private array $config;
 
     public function activate(Composer $composer, IOInterface $io): void
     {
@@ -34,9 +38,14 @@ class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterfa
 
     public function loadRepositories(CommandEvent $event): void
     {
+        $config = $this->getConfig();
+        $triggerCommands = (array)($config['trigger-commands'] ?? ['install', 'update']);
+        $ignoreOptions = (array)($config['ignore-options'] ?? ['no-dev', 'prefer-source']);
+        $testOptions = array_intersect_key($event->getInput()->getOptions(), array_flip($ignoreOptions));
+
         if (
-            !in_array($event->getCommandName(), ['install', 'update'], true)
-            || $event->getInput()->getOption('no-dev')
+            array_filter($testOptions) !== []
+            || !in_array($event->getCommandName(), $triggerCommands, true)
         ) {
             return;
         }
@@ -97,6 +106,31 @@ class LocalRepositoriesPlugin implements PluginInterface, EventSubscriberInterfa
 
         $this->io->write('Repository added successfully', true, IOInterface::VERBOSE);
     }
+
+    /**
+     * @return array{"ignore-options"?: string[], "trigger-commands"?: string[]}
+     */
+    private function getConfig(): array
+    {
+        if (!isset($this->config)) {
+            $this->config = [];
+
+            $global_composer_file_path = $this->composer->getConfig()->get('home') . '/composer.json';
+            if (!file_exists($global_composer_file_path)) {
+                return $this->config = [];
+            }
+
+            try {
+                $global_config = (new JsonFile($global_composer_file_path))->read();
+                $this->config = $global_config['extra']['local-repositories'] ?? [];
+            } catch (ParsingException $e) {
+                $this->config = [];
+            }
+        }
+
+        return $this->config;
+    }
+
 
     public function deactivate(Composer $composer, IOInterface $io): void
     {
