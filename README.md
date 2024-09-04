@@ -6,7 +6,7 @@ your `composer.json` file.
 ## How to install
 
 ```bash
-composer require --global ollieread/composer-local-repositories
+composer require global ollieread/composer-local-repositories
 ```
 
 ## How to use
@@ -28,7 +28,7 @@ valid composer `repositories` key. For example:
 ```
 
 During a `composer install` or `composer update`, the plugin will locate the `repositories.json` file; and prepend all
-the configured repositories. If composer finds any of the `require` package inside these repositories, it will install
+the configured repositories. If composer finds any of the `require` packages inside these repositories, it will install
 the package from that repository instead.
 
 ## Configuration
