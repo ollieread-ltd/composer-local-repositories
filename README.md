@@ -6,7 +6,7 @@ your `composer.json` file.
 ## How to install
 
 ```bash
-composer require global ollieread/composer-local-repositories
+composer global require ollieread/composer-local-repositories
 ```
 
 ## How to use
